@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -58,30 +59,31 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
+        ChessGame.TeamColor color = piece.getTeamColor();
         PieceMovesCalculator calculator;
         if (piece.getPieceType() == PieceType.BISHOP) {
             calculator = new BishopMoves();
-            return calculator.pieceMoves(board, myPosition);
+            return calculator.pieceMoves(board, myPosition, color);
         }
         else if (piece.getPieceType() == PieceType.KING) {
             calculator = new KingMoves();
-            return  calculator.pieceMoves(board,myPosition);
+            return  calculator.pieceMoves(board, myPosition,color);
         }
         else if (piece.getPieceType() == PieceType.KNIGHT) {
             calculator = new KnightMoves();
-            return  calculator.pieceMoves(board,myPosition);
+            return  calculator.pieceMoves(board, myPosition, color);
         }
         else if (piece.getPieceType() == PieceType.PAWN) {
             calculator = new PawnMoves();
-            return  calculator.pieceMoves(board,myPosition);
+            return  calculator.pieceMoves(board, myPosition, color);
         }
         else if (piece.getPieceType() == PieceType.QUEEN) {
             calculator = new QueenMoves();
-            return  calculator.pieceMoves(board,myPosition);
+            return  calculator.pieceMoves(board, myPosition, color);
         }
         else if (piece.getPieceType() == PieceType.ROOK) {
             calculator = new RookMoves();
-            return  calculator.pieceMoves(board,myPosition);
+            return  calculator.pieceMoves(board, myPosition, color);
         }
         else {
             return List.of();
@@ -114,48 +116,71 @@ public class ChessPiece {
     }
 }
 
+record Pair(int firstItem, int secondItem){}
+
 interface PieceMovesCalculator {
-    Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition);
+    Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color);
+
+    default boolean spaceClearOrTakeable (ChessBoard board, ChessPosition movePosition, ChessGame.TeamColor color) {
+        if (board.isInBounds(movePosition)) {
+            if (board.getPiece(movePosition) == null) {
+                return true;
+            } else return board.getPiece(movePosition).getTeamColor() != color;
+        }
+        else {
+            return false;
+        }
+    }
 }
 
 class BishopMoves implements PieceMovesCalculator {
     @Override
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
         return List.of();
     }
 }
 
 class KingMoves implements PieceMovesCalculator {
     @Override
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return List.of();
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
+        List<ChessMove> moveList = new ArrayList<>();
+        List<Pair> movePairs = List.of(new Pair(0, 1), new Pair(1, 0), new Pair(-1, 0), new Pair(0, -1), new Pair(1,1), new Pair(1,-1), new Pair(-1,1), new Pair(-1,-1));
+
+        for (Pair pair : movePairs) {
+            ChessPosition positionToTry = new ChessPosition(myPosition.getRow()+pair.firstItem(), myPosition.getColumn()+ pair.secondItem());
+            if (board.isInBounds(positionToTry) && spaceClearOrTakeable(board, positionToTry, color)) {
+                moveList.add(new ChessMove(myPosition, positionToTry, null));
+            }
+        }
+
+        return moveList;
     }
 }
 
 class KnightMoves implements PieceMovesCalculator {
     @Override
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
         return List.of();
     }
 }
 
 class PawnMoves implements PieceMovesCalculator {
     @Override
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
         return List.of();
     }
 }
 
 class QueenMoves implements PieceMovesCalculator {
     @Override
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
         return List.of();
     }
 }
 
 class RookMoves implements PieceMovesCalculator {
     @Override
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
         return List.of();
     }
 }
