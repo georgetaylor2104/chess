@@ -204,7 +204,23 @@ class PawnMoves implements PieceMovesCalculator {
 class QueenMoves implements PieceMovesCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
-        return List.of();
+        List<ChessMove> moveList = new ArrayList<>();
+        List<Pair> movePairs = List.of(new Pair(1,1), new Pair(1,-1), new Pair(-1,-1), new Pair(-1,1), new Pair(1,0), new Pair(-1, 0), new Pair(0, 1), new Pair(0, -1));
+
+        for (Pair pair : movePairs) {
+            ChessPosition currentPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
+            ChessPosition positionToTry = new ChessPosition(currentPosition.getRow()+pair.firstItem(), currentPosition.getColumn()+pair.secondItem());
+            while (spaceClearOrTakeable(board, positionToTry, color)) {
+                moveList.add(new ChessMove(myPosition, positionToTry, null));
+                if (enemyCollision(board, positionToTry, color)) {
+                    break;
+                }
+                currentPosition = positionToTry;
+                positionToTry = new ChessPosition(currentPosition.getRow()+pair.firstItem(), currentPosition.getColumn()+pair.secondItem());
+            }
+        }
+
+        return moveList;
     }
 }
 
