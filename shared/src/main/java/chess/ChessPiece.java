@@ -160,7 +160,17 @@ class KingMoves implements PieceMovesCalculator {
 class KnightMoves implements PieceMovesCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
-        return List.of();
+        List<ChessMove> moveList = new ArrayList<>();
+        List<Pair> movePairs = List.of(new Pair(1,2), new Pair(-1,2), new Pair(1,-2), new Pair(-1,-2), new Pair(2,1), new Pair(2,-1), new Pair(-2,1), new Pair(-2,-1));
+
+        for (Pair pair : movePairs) {
+            ChessPosition positionToTry = new ChessPosition(myPosition.getRow()+pair.firstItem(), myPosition.getColumn()+pair.secondItem());
+            if (board.isInBounds(positionToTry) && spaceClearOrTakeable(board, positionToTry, color)) {
+                moveList.add(new ChessMove(myPosition, positionToTry, null));
+            }
+        }
+
+        return moveList;
     }
 }
 

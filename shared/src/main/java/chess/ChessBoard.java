@@ -41,7 +41,7 @@ public class ChessBoard {
     }
 
     public boolean isInBounds(ChessPosition position) {
-        return ((position.getColumn() <= 8 && position.getColumn() >= 0) && (position.getRow() <= 8 && position.getRow() >= 0));
+        return ((position.getRow() <= 8 && position.getRow() > 0) && (position.getColumn() <= 8 && position.getColumn() > 0));
     }
     /**
      * Sets the board to the default starting board
