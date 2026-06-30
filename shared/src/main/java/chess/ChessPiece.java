@@ -118,6 +118,8 @@ public class ChessPiece {
 
 record Pair(int firstItem, int secondItem){}
 
+
+//REFACTOR INTERFACE TO HAVE LOOP MOVES AND SINGLE MOVES DEFAULT METHODS THAT YOU JUST PLUG IN THE PAIR LIST INTO
 interface PieceMovesCalculator {
     Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color);
 
@@ -133,7 +135,7 @@ interface PieceMovesCalculator {
     }
 
     default boolean enemyCollision(ChessBoard board, ChessPosition position, ChessGame.TeamColor color) {
-        return board.getPiece(position) != null && board.getPiece(position).getTeamColor() != color;
+        return board.isInBounds(position) && board.getPiece(position) != null && board.getPiece(position).getTeamColor() != color;
     }
 }
 
@@ -195,54 +197,218 @@ class KnightMoves implements PieceMovesCalculator {
 }
 
 class PawnMoves implements PieceMovesCalculator {
-    @Override
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
-        return List.of();
-    }
-}
-
-class QueenMoves implements PieceMovesCalculator {
-    @Override
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
-        List<ChessMove> moveList = new ArrayList<>();
-        List<Pair> movePairs = List.of(new Pair(1,1), new Pair(1,-1), new Pair(-1,-1), new Pair(-1,1), new Pair(1,0), new Pair(-1, 0), new Pair(0, 1), new Pair(0, -1));
-
-        for (Pair pair : movePairs) {
-            ChessPosition currentPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
-            ChessPosition positionToTry = new ChessPosition(currentPosition.getRow()+pair.firstItem(), currentPosition.getColumn()+pair.secondItem());
-            while (spaceClearOrTakeable(board, positionToTry, color)) {
-                moveList.add(new ChessMove(myPosition, positionToTry, null));
-                if (enemyCollision(board, positionToTry, color)) {
-                    break;
-                }
-                currentPosition = positionToTry;
-                positionToTry = new ChessPosition(currentPosition.getRow()+pair.firstItem(), currentPosition.getColumn()+pair.secondItem());
+    public String enemiesPresent(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
+        //returns "" if no corner enemies and front clear
+        //returns R if enemy diagonal right
+        //returns L if enemy diagonal left
+        //returns RL if two diagonal enemies
+        //returns RLF if two diagonal enemies and front is blocked
+        // RF and LF are also possibilites
+        //F if the front is blocked
+        String enemies = "";
+        if (color == ChessGame.TeamColor.WHITE) {
+            if (enemyCollision(board, new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1), color)) {
+                enemies += "R";
+            }
+            if (enemyCollision(board, new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1), color)) {
+                enemies += "L";
+            }
+            if (!board.isInBounds(new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn())) || board.getPiece(new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn())) != null) {
+                enemies += "F";
+            }
+        } else {
+            if (enemyCollision(board, new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1), color)) {
+                enemies += "R";
+            }
+            if (enemyCollision(board, new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1), color)) {
+                enemies += "L";
+            }
+            if (!board.isInBounds(new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn())) || board.getPiece(new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn())) != null) {
+                enemies += "F";
             }
         }
 
-        return moveList;
+        return enemies;
     }
-}
 
-class RookMoves implements PieceMovesCalculator {
+    public List<Pair> listOfMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
+        if (color == ChessGame.TeamColor.WHITE) {
+            return switch (enemiesPresent(board, myPosition, color)) {
+                case "" -> List.of(new Pair(1, 0));
+                case "R" -> List.of(new Pair(1, 0), new Pair(1, 1));
+                case "RL" -> List.of(new Pair(1, 0), new Pair(1, 1), new Pair(1, -1));
+                case "RLF" -> List.of(new Pair(1, 1), new Pair(1, -1));
+                case "L" -> List.of(new Pair(1, 0), new Pair(1, -1));
+                case "RF" -> List.of(new Pair(1, 1));
+                case "LF" -> List.of(new Pair(1, -1));
+                default -> List.of();
+            };
+        } else {
+            return switch (enemiesPresent(board, myPosition, color)) {
+                case "" -> List.of(new Pair(-1, 0));
+                case "R" -> List.of(new Pair(-1, 0), new Pair(-1, 1));
+                case "RL" -> List.of(new Pair(-1, 0), new Pair(-1, 1), new Pair(-1, -1));
+                case "RLF" -> List.of(new Pair(-1, 1), new Pair(-1, -1));
+                case "L" -> List.of(new Pair(-1, 0), new Pair(-1, -1));
+                case "RF" -> List.of(new Pair(-1, 1));
+                case "LF" -> List.of(new Pair(-1, -1));
+                default -> List.of();
+            };
+        }
+    }
+
+//    public Collection<ChessMove> moveSwitch(ChessPosition myPosition, ChessPosition positionToTry, ChessGame.TeamColor color, ChessPiece.PieceType promotionPiece) {
+//        List<ChessMove> moveList = new ArrayList<>();
+//        switch (color) {
+//            case WHITE:
+//                if (positionToTry.getRow() == 8) {
+//                    moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.ROOK));
+//                    moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.KNIGHT));
+//                    moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.BISHOP));
+//                    moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.QUEEN));
+//                } else {
+//                    moveList.add(new ChessMove(myPosition, positionToTry, null));
+//                }
+//                break;
+//            case BLACK:
+//                if (positionToTry.getRow() == 1) {
+//                    moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.ROOK));
+//                    moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.KNIGHT));
+//                    moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.BISHOP));
+//                    moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.QUEEN));
+//                } else {
+//                    moveList.add(new ChessMove(myPosition, positionToTry, null));
+//                }
+//                break;
+//        }
+//
+//
+//        return moveList;
+//    }
+
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
         List<ChessMove> moveList = new ArrayList<>();
-        List<Pair> movePairs = List.of(new Pair(1,0), new Pair(-1, 0), new Pair(0, 1), new Pair(0, -1));
+        List<Pair> movePairs = listOfMoves(board, myPosition, color);
+        ChessPosition firstMoveWhite = new ChessPosition(myPosition.getRow() + 2, myPosition.getColumn());
+        ChessPosition firstMoveBlack = new ChessPosition(myPosition.getRow() - 2, myPosition.getColumn());
+
+        switch (color) {
+            case WHITE:
+                if (myPosition.getRow() == 2) {
+                    if (board.getPiece(firstMoveWhite) == null) {
+                        moveList.add(new ChessMove(myPosition, firstMoveWhite, null));
+                    }
+                }
+            case BLACK:
+                if (myPosition.getRow() == 7) {
+                    if (board.getPiece(firstMoveBlack) == null) {
+                        moveList.add(new ChessMove(myPosition, firstMoveBlack, null));
+                    }
+                }
+        }
 
         for (Pair pair : movePairs) {
-            ChessPosition currentPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
-            ChessPosition positionToTry = new ChessPosition(currentPosition.getRow()+pair.firstItem(), currentPosition.getColumn()+pair.secondItem());
-            while (spaceClearOrTakeable(board, positionToTry, color)) {
-                moveList.add(new ChessMove(myPosition, positionToTry, null));
-                if (enemyCollision(board, positionToTry, color)) {
-                    break;
+            ChessPosition positionToTry = new ChessPosition(myPosition.getRow() + pair.firstItem(), myPosition.getColumn() + pair.secondItem());
+            if (pair.secondItem() == 0) {
+                if (board.getPiece(positionToTry) == null) {
+                    switch (color) {
+                        case WHITE:
+                            if (positionToTry.getRow() == 8) {
+                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.ROOK));
+                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.KNIGHT));
+                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.BISHOP));
+                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.QUEEN));
+                            } else {
+                                moveList.add(new ChessMove(myPosition, positionToTry, null));
+                            }
+                            break;
+                        case BLACK:
+                            if (positionToTry.getRow() == 1) {
+                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.ROOK));
+                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.KNIGHT));
+                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.BISHOP));
+                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.QUEEN));
+                            } else {
+                                moveList.add(new ChessMove(myPosition, positionToTry, null));
+                            }
+                            break;
+                    }
                 }
-                currentPosition = positionToTry;
-                positionToTry = new ChessPosition(currentPosition.getRow()+pair.firstItem(), currentPosition.getColumn()+pair.secondItem());
+                else if (spaceClearOrTakeable(board, positionToTry, color)) {
+                    switch (color) {
+                        case WHITE:
+                            if (positionToTry.getRow() == 8) {
+                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.ROOK));
+                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.KNIGHT));
+                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.BISHOP));
+                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.QUEEN));
+                            } else {
+                                moveList.add(new ChessMove(myPosition, positionToTry, null));
+                            }
+                            break;
+                        case BLACK:
+                            if (positionToTry.getRow() == 1) {
+                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.ROOK));
+                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.KNIGHT));
+                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.BISHOP));
+                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.QUEEN));
+                            } else {
+                                moveList.add(new ChessMove(myPosition, positionToTry, null));
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+        return moveList;
+        }
+    }
+
+
+
+        class QueenMoves implements PieceMovesCalculator {
+            @Override
+            public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
+                List<ChessMove> moveList = new ArrayList<>();
+                List<Pair> movePairs = List.of(new Pair(1, 1), new Pair(1, -1), new Pair(-1, -1), new Pair(-1, 1), new Pair(1, 0), new Pair(-1, 0), new Pair(0, 1), new Pair(0, -1));
+
+                for (Pair pair : movePairs) {
+                    ChessPosition currentPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
+                    ChessPosition positionToTry = new ChessPosition(currentPosition.getRow() + pair.firstItem(), currentPosition.getColumn() + pair.secondItem());
+                    while (spaceClearOrTakeable(board, positionToTry, color)) {
+                        moveList.add(new ChessMove(myPosition, positionToTry, null));
+                        if (enemyCollision(board, positionToTry, color)) {
+                            break;
+                        }
+                        currentPosition = positionToTry;
+                        positionToTry = new ChessPosition(currentPosition.getRow() + pair.firstItem(), currentPosition.getColumn() + pair.secondItem());
+                    }
+                }
+
+                return moveList;
             }
         }
 
-        return moveList;
-    }
-}
+        class RookMoves implements PieceMovesCalculator {
+            @Override
+            public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
+                List<ChessMove> moveList = new ArrayList<>();
+                List<Pair> movePairs = List.of(new Pair(1, 0), new Pair(-1, 0), new Pair(0, 1), new Pair(0, -1));
+
+                for (Pair pair : movePairs) {
+                    ChessPosition currentPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
+                    ChessPosition positionToTry = new ChessPosition(currentPosition.getRow() + pair.firstItem(), currentPosition.getColumn() + pair.secondItem());
+                    while (spaceClearOrTakeable(board, positionToTry, color)) {
+                        moveList.add(new ChessMove(myPosition, positionToTry, null));
+                        if (enemyCollision(board, positionToTry, color)) {
+                            break;
+                        }
+                        currentPosition = positionToTry;
+                        positionToTry = new ChessPosition(currentPosition.getRow() + pair.firstItem(), currentPosition.getColumn() + pair.secondItem());
+                    }
+                }
+
+                return moveList;
+            }
+        }
