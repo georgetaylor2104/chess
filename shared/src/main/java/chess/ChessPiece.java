@@ -119,7 +119,7 @@ public class ChessPiece {
 record Pair(int firstItem, int secondItem){}
 
 
-//REFACTOR INTERFACE TO HAVE LOOP MOVES AND SINGLE MOVES DEFAULT METHODS THAT YOU JUST PLUG IN THE PAIR LIST INTO
+//REFACTOR INTERFACE TO HAVE LOOP MOVES AND SINGLE MOVES DEFAULT METHODS THAT YOU JUST PLUG IN THE PAIR LIST INTO (eventually)
 interface PieceMovesCalculator {
     Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color);
 
@@ -223,7 +223,7 @@ class PawnMoves implements PieceMovesCalculator {
             if (enemyCollision(board, new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1), color)) {
                 enemies += "L";
             }
-            if (!board.isInBounds(new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn())) || board.getPiece(new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn())) != null) {
+            if (!board.isInBounds(new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn())) || board.getPiece(new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn())) != null) {
                 enemies += "F";
             }
         }
@@ -302,6 +302,7 @@ class PawnMoves implements PieceMovesCalculator {
                         }
                     }
                 }
+                break;
             case BLACK:
                 if (myPosition.getRow() == 7) {
                     if (board.getPiece(new ChessPosition(firstMoveBlack.getRow()+1,firstMoveBlack.getColumn())) == null) {
@@ -310,6 +311,7 @@ class PawnMoves implements PieceMovesCalculator {
                         }
                     }
                 }
+                break;
         }
 
         for (Pair pair : movePairs) {
