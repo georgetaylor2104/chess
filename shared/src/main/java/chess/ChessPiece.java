@@ -343,29 +343,29 @@ class PawnMoves implements PieceMovesCalculator {
                     }
                 }
             }
-                else if (spaceClearOrTakeable(board, positionToTry, color)) {
-                    switch (color) {
-                        case WHITE:
-                            if (positionToTry.getRow() == 8) {
-                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.ROOK));
-                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.KNIGHT));
-                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.BISHOP));
-                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.QUEEN));
-                            } else {
-                                moveList.add(new ChessMove(myPosition, positionToTry, null));
-                            }
-                            break;
+            else if (spaceClearOrTakeable(board, positionToTry, color)) {
+                switch (color) {
+                    case WHITE:
+                        if (positionToTry.getRow() == 8) {
+                            moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.ROOK));
+                            moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.KNIGHT));
+                            moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.BISHOP));
+                            moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.QUEEN));
+                        } else {
+                            moveList.add(new ChessMove(myPosition, positionToTry, null));
+                        }
+                        break;
 
-                        case BLACK:
-                            if (positionToTry.getRow() == 1) {
-                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.ROOK));
-                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.KNIGHT));
-                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.BISHOP));
-                                moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.QUEEN));
-                            } else {
-                                moveList.add(new ChessMove(myPosition, positionToTry, null));
-                            }
-                            break;
+                    case BLACK:
+                        if (positionToTry.getRow() == 1) {
+                            moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.ROOK));
+                            moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.KNIGHT));
+                            moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.BISHOP));
+                            moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.QUEEN));
+                        } else {
+                            moveList.add(new ChessMove(myPosition, positionToTry, null));
+                        }
+                        break;
                     }
                 }
             }
