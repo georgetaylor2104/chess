@@ -50,6 +50,14 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        // get the piece type from starting position
+        // get the pieces moves
+        // for each move make a deep copy of the board
+        // then call isInCheck() for each move
+        // if true then remove that move from the set
+        // else the move stays
+        // return the set of valid moves
+
         throw new RuntimeException("Not implemented");
     }
 
@@ -60,6 +68,16 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        // save what the piece is from the starting position
+        // get the piece's valid moves
+        // if 'move' not in set of valid moves: throw exception
+        // otherwise make the move
+
+        // move making ideas:
+        // make a deep copy of the piece, make starting pos null, put the deep copy at the end pos
+
+        // put the actual moving in a method called movePiece?
+
         throw new RuntimeException("Not implemented");
     }
 
@@ -70,6 +88,8 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        // inefficient, but you could save the king's position and then get piece moves for all
+        // opposing pieces and if any are the same as the king's position then he's in check
         throw new RuntimeException("Not implemented");
     }
 
@@ -80,6 +100,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+        // if there are no valid moves and current position is also in check
         throw new RuntimeException("Not implemented");
     }
 
@@ -91,6 +112,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+        // if there are no valid moves and current position is not in check
         throw new RuntimeException("Not implemented");
     }
 
