@@ -11,7 +11,7 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessPiece {
+public class ChessPiece implements Cloneable {
 
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
@@ -113,6 +113,11 @@ public class ChessPiece {
     @Override
     public int hashCode() {
         return Objects.hash(pieceColor, type);
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }
 
@@ -376,48 +381,48 @@ class PawnMoves implements PieceMovesCalculator {
 
 
 
-        class QueenMoves implements PieceMovesCalculator {
-            @Override
-            public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
-                List<ChessMove> moveList = new ArrayList<>();
-                List<Pair> movePairs = List.of(new Pair(1, 1), new Pair(1, -1), new Pair(-1, -1), new Pair(-1, 1), new Pair(1, 0), new Pair(-1, 0), new Pair(0, 1), new Pair(0, -1));
+class QueenMoves implements PieceMovesCalculator {
+    @Override
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
+        List<ChessMove> moveList = new ArrayList<>();
+        List<Pair> movePairs = List.of(new Pair(1, 1), new Pair(1, -1), new Pair(-1, -1), new Pair(-1, 1), new Pair(1, 0), new Pair(-1, 0), new Pair(0, 1), new Pair(0, -1));
 
-                for (Pair pair : movePairs) {
-                    ChessPosition currentPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
-                    ChessPosition positionToTry = new ChessPosition(currentPosition.getRow() + pair.firstItem(), currentPosition.getColumn() + pair.secondItem());
-                    while (spaceClearOrTakeable(board, positionToTry, color)) {
-                        moveList.add(new ChessMove(myPosition, positionToTry, null));
-                        if (enemyCollision(board, positionToTry, color)) {
-                            break;
-                        }
-                        currentPosition = positionToTry;
-                        positionToTry = new ChessPosition(currentPosition.getRow() + pair.firstItem(), currentPosition.getColumn() + pair.secondItem());
-                    }
+        for (Pair pair : movePairs) {
+            ChessPosition currentPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
+            ChessPosition positionToTry = new ChessPosition(currentPosition.getRow() + pair.firstItem(), currentPosition.getColumn() + pair.secondItem());
+            while (spaceClearOrTakeable(board, positionToTry, color)) {
+                moveList.add(new ChessMove(myPosition, positionToTry, null));
+                if (enemyCollision(board, positionToTry, color)) {
+                    break;
                 }
-
-                return moveList;
+                currentPosition = positionToTry;
+                positionToTry = new ChessPosition(currentPosition.getRow() + pair.firstItem(), currentPosition.getColumn() + pair.secondItem());
             }
         }
 
-        class RookMoves implements PieceMovesCalculator {
-            @Override
-            public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
-                List<ChessMove> moveList = new ArrayList<>();
-                List<Pair> movePairs = List.of(new Pair(1, 0), new Pair(-1, 0), new Pair(0, 1), new Pair(0, -1));
+        return moveList;
+    }
+}
 
-                for (Pair pair : movePairs) {
-                    ChessPosition currentPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
-                    ChessPosition positionToTry = new ChessPosition(currentPosition.getRow() + pair.firstItem(), currentPosition.getColumn() + pair.secondItem());
-                    while (spaceClearOrTakeable(board, positionToTry, color)) {
-                        moveList.add(new ChessMove(myPosition, positionToTry, null));
-                        if (enemyCollision(board, positionToTry, color)) {
-                            break;
-                        }
-                        currentPosition = positionToTry;
-                        positionToTry = new ChessPosition(currentPosition.getRow() + pair.firstItem(), currentPosition.getColumn() + pair.secondItem());
-                    }
+class RookMoves implements PieceMovesCalculator {
+    @Override
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
+        List<ChessMove> moveList = new ArrayList<>();
+        List<Pair> movePairs = List.of(new Pair(1, 0), new Pair(-1, 0), new Pair(0, 1), new Pair(0, -1));
+
+        for (Pair pair : movePairs) {
+            ChessPosition currentPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
+            ChessPosition positionToTry = new ChessPosition(currentPosition.getRow() + pair.firstItem(), currentPosition.getColumn() + pair.secondItem());
+            while (spaceClearOrTakeable(board, positionToTry, color)) {
+                moveList.add(new ChessMove(myPosition, positionToTry, null));
+                if (enemyCollision(board, positionToTry, color)) {
+                    break;
                 }
-
-                return moveList;
+                currentPosition = positionToTry;
+                positionToTry = new ChessPosition(currentPosition.getRow() + pair.firstItem(), currentPosition.getColumn() + pair.secondItem());
             }
         }
+
+        return moveList;
+    }
+}

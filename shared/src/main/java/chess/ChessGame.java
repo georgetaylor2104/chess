@@ -58,7 +58,16 @@ public class ChessGame {
         // else the move stays
         // return the set of valid moves
 
+        ChessPiece piece = gameBoard.getPiece(startPosition);
+
         throw new RuntimeException("Not implemented");
+    }
+
+    public void movePiece(ChessMove move) {
+        ChessPiece piece = gameBoard.getPiece(move.getStartPosition());
+        gameBoard.addPiece(move.getEndPosition(), piece);
+        gameBoard.addPiece(move.getStartPosition(), null);
+
     }
 
     /**
@@ -68,16 +77,18 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        // save what the piece is from the starting position
-        // get the piece's valid moves
-        // if 'move' not in set of valid moves: throw exception
-        // otherwise make the move
+        ChessPosition piecePosition = move.getStartPosition();
+        Collection<ChessMove> validMovesList = validMoves(piecePosition);
 
-        // move making ideas:
-        // make a deep copy of the piece, make starting pos null, put the deep copy at the end pos
+        if (validMovesList.contains(move)) {
+            movePiece(move);
+        }
+        else {
+            throw new InvalidMoveException();
+        }
+    }
 
-        // put the actual moving in a method called movePiece?
-
+    public ChessPosition kingPosition(TeamColor color) {
         throw new RuntimeException("Not implemented");
     }
 
