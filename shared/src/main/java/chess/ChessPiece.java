@@ -11,16 +11,31 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessPiece implements Cloneable {
+public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
+    public boolean firstMove;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+        this.firstMove = true;
     }
 
+    public ChessPiece (ChessPiece other) {
+        this.pieceColor = other.pieceColor;
+        this.type = other.type;
+        this.firstMove = other.firstMove;
+    }
+
+    public boolean getFirstMove() {
+        return firstMove;
+    }
+
+    public void setFirstMove(boolean bool) {
+        firstMove = bool;
+    }
     /**
      * The various different chess piece options
      */
@@ -115,10 +130,6 @@ public class ChessPiece implements Cloneable {
         return Objects.hash(pieceColor, type);
     }
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
 }
 
 record Pair(int firstItem, int secondItem){}
@@ -293,30 +304,33 @@ class PawnMoves implements PieceMovesCalculator {
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
+        ChessPiece piece = board.getPiece(myPosition);
         List<ChessMove> moveList = new ArrayList<>();
         List<Pair> movePairs = listOfMoves(board, myPosition, color);
         ChessPosition firstMoveWhite = new ChessPosition(myPosition.getRow() + 2, myPosition.getColumn());
         ChessPosition firstMoveBlack = new ChessPosition(myPosition.getRow() - 2, myPosition.getColumn());
-
-        switch (color) {
-            case WHITE:
-                if (myPosition.getRow() == 2) {
-                    if (board.getPiece(new ChessPosition(firstMoveWhite.getRow()-1,firstMoveWhite.getColumn())) == null) {
-                        if (board.getPiece(firstMoveWhite) == null) {
-                            moveList.add(new ChessMove(myPosition, firstMoveWhite, null));
+        if (piece.getFirstMove()) {
+            switch (color) {
+                case WHITE:
+                    if (myPosition.getRow() == 2) {
+                        if (board.getPiece(new ChessPosition(firstMoveWhite.getRow() - 1, firstMoveWhite.getColumn())) == null) {
+                            if (board.getPiece(firstMoveWhite) == null) {
+                                moveList.add(new ChessMove(myPosition, firstMoveWhite, null));
+                            }
                         }
                     }
-                }
-                break;
-            case BLACK:
-                if (myPosition.getRow() == 7) {
-                    if (board.getPiece(new ChessPosition(firstMoveBlack.getRow()+1,firstMoveBlack.getColumn())) == null) {
-                        if (board.getPiece(firstMoveBlack) == null) {
-                            moveList.add(new ChessMove(myPosition, firstMoveBlack, null));
+                    break;
+                case BLACK:
+                    if (myPosition.getRow() == 7) {
+                        if (board.getPiece(new ChessPosition(firstMoveBlack.getRow() + 1, firstMoveBlack.getColumn())) == null) {
+                            if (board.getPiece(firstMoveBlack) == null) {
+                                moveList.add(new ChessMove(myPosition, firstMoveBlack, null));
+                            }
                         }
                     }
-                }
-                break;
+                    break;
+            }
+            piece.setFirstMove(false);
         }
 
         for (Pair pair : movePairs) {

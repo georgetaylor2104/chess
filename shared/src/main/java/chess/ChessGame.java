@@ -18,6 +18,11 @@ public class ChessGame {
         gameBoard.resetBoard();
     }
 
+    public ChessGame(ChessGame other) {
+        this.teamTurn = other.teamTurn;
+        this.gameBoard = new ChessBoard(other.gameBoard);
+    }
+
     /**
      * @return Which team's turn it is
      */
