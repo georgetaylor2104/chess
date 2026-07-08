@@ -1,7 +1,9 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A class that can manage a chess game, making moves on a board
@@ -97,7 +99,33 @@ public class ChessGame {
     }
 
     private ChessPosition kingPosition(TeamColor color) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition pos;
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                pos = new ChessPosition(r+1, c+1);
+                ChessPiece piece = gameBoard.getPiece(pos);
+                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == color) {
+                    return pos;
+                }
+            }
+        }
+        throw new RuntimeException("King piece not found");
+    }
+
+    private Collection<ChessPosition> getEnemyTeamPositions (TeamColor teamColor) {
+        Set<ChessPosition> enemyPositions = new HashSet<>();
+
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                ChessPosition pos = new ChessPosition(r+1, c+1);
+                ChessPiece piece = gameBoard.getPiece(pos);
+                if (piece != null && piece.getTeamColor() != teamColor) {
+                    enemyPositions.add(pos);
+                }
+            }
+        }
+
+        return enemyPositions;
     }
 
     /**
@@ -107,12 +135,20 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        // inefficient, but you could save the king's position and then get piece moves for all
-        // opposing pieces and if any are the same as the king's position then he's in check
         ChessPosition kingPos = kingPosition(teamColor);
-        
+        Collection<ChessPosition> enemyPositions = getEnemyTeamPositions(teamColor);
 
-        throw new RuntimeException("Not implemented");
+        for (ChessPosition enemyPos : enemyPositions) {
+            ChessPiece piece = gameBoard.getPiece(enemyPos);
+            Collection<ChessMove> moves = piece.pieceMoves(gameBoard, enemyPos);
+            for (ChessMove move : moves) {
+                if (move.getEndPosition().equals(kingPos)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

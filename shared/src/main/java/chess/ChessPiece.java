@@ -1,9 +1,6 @@
 package chess;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Represents a single chess piece
@@ -158,7 +155,7 @@ interface PieceMovesCalculator {
 class BishopMoves implements PieceMovesCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
-        List<ChessMove> moveList = new ArrayList<>();
+        Set<ChessMove> moveList = new HashSet<>();
         List<Pair> movePairs = List.of(new Pair(1,1), new Pair(1,-1), new Pair(-1,-1), new Pair(-1,1));
 
         for (Pair pair : movePairs) {
@@ -181,7 +178,7 @@ class BishopMoves implements PieceMovesCalculator {
 class KingMoves implements PieceMovesCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
-        List<ChessMove> moveList = new ArrayList<>();
+        Set<ChessMove> moveList = new HashSet<>();
         List<Pair> movePairs = List.of(new Pair(0, 1), new Pair(1, 0), new Pair(-1, 0), new Pair(0, -1), new Pair(1,1), new Pair(1,-1), new Pair(-1,1), new Pair(-1,-1));
 
         for (Pair pair : movePairs) {
@@ -198,7 +195,7 @@ class KingMoves implements PieceMovesCalculator {
 class KnightMoves implements PieceMovesCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
-        List<ChessMove> moveList = new ArrayList<>();
+        Set<ChessMove> moveList = new HashSet<>();
         List<Pair> movePairs = List.of(new Pair(1,2), new Pair(-1,2), new Pair(1,-2), new Pair(-1,-2), new Pair(2,1), new Pair(2,-1), new Pair(-2,1), new Pair(-2,-1));
 
         for (Pair pair : movePairs) {
@@ -273,39 +270,10 @@ class PawnMoves implements PieceMovesCalculator {
         }
     }
 
-//    public Collection<ChessMove> moveSwitch(ChessPosition myPosition, ChessPosition positionToTry, ChessGame.TeamColor color, ChessPiece.PieceType promotionPiece) {
-//        List<ChessMove> moveList = new ArrayList<>();
-//        switch (color) {
-//            case WHITE:
-//                if (positionToTry.getRow() == 8) {
-//                    moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.ROOK));
-//                    moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.KNIGHT));
-//                    moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.BISHOP));
-//                    moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.QUEEN));
-//                } else {
-//                    moveList.add(new ChessMove(myPosition, positionToTry, null));
-//                }
-//                break;
-//            case BLACK:
-//                if (positionToTry.getRow() == 1) {
-//                    moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.ROOK));
-//                    moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.KNIGHT));
-//                    moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.BISHOP));
-//                    moveList.add(new ChessMove(myPosition, positionToTry, ChessPiece.PieceType.QUEEN));
-//                } else {
-//                    moveList.add(new ChessMove(myPosition, positionToTry, null));
-//                }
-//                break;
-//        }
-//
-//
-//        return moveList;
-//    }
-
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
         ChessPiece piece = board.getPiece(myPosition);
-        List<ChessMove> moveList = new ArrayList<>();
+        Set<ChessMove> moveList = new HashSet<>();
         List<Pair> movePairs = listOfMoves(board, myPosition, color);
         ChessPosition firstMoveWhite = new ChessPosition(myPosition.getRow() + 2, myPosition.getColumn());
         ChessPosition firstMoveBlack = new ChessPosition(myPosition.getRow() - 2, myPosition.getColumn());
@@ -398,7 +366,7 @@ class PawnMoves implements PieceMovesCalculator {
 class QueenMoves implements PieceMovesCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
-        List<ChessMove> moveList = new ArrayList<>();
+        Set<ChessMove> moveList = new HashSet<>();
         List<Pair> movePairs = List.of(new Pair(1, 1), new Pair(1, -1), new Pair(-1, -1), new Pair(-1, 1), new Pair(1, 0), new Pair(-1, 0), new Pair(0, 1), new Pair(0, -1));
 
         for (Pair pair : movePairs) {
@@ -421,7 +389,7 @@ class QueenMoves implements PieceMovesCalculator {
 class RookMoves implements PieceMovesCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
-        List<ChessMove> moveList = new ArrayList<>();
+        Set<ChessMove> moveList = new HashSet<>();
         List<Pair> movePairs = List.of(new Pair(1, 0), new Pair(-1, 0), new Pair(0, 1), new Pair(0, -1));
 
         for (Pair pair : movePairs) {
