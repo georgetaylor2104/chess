@@ -112,7 +112,9 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         // if there are no valid moves and current position is also in check
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPos = kingPosition(teamColor);
+        return (validMoves(kingPos).isEmpty() && isInCheck(teamColor));
+
     }
 
     /**
@@ -124,7 +126,8 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         // if there are no valid moves and current position is not in check
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPos = kingPosition(teamColor);
+        return (validMoves(kingPos).isEmpty() && !isInCheck(teamColor));
     }
 
     /**
