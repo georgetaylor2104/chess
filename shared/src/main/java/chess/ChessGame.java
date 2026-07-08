@@ -59,11 +59,13 @@ public class ChessGame {
         // return the set of valid moves
 
         ChessPiece piece = gameBoard.getPiece(startPosition);
+        TeamColor color = piece.getTeamColor();
+
 
         throw new RuntimeException("Not implemented");
     }
 
-    public void movePiece(ChessMove move) {
+    private void movePiece(ChessMove move) {
         ChessPiece piece = gameBoard.getPiece(move.getStartPosition());
         gameBoard.addPiece(move.getEndPosition(), piece);
         gameBoard.addPiece(move.getStartPosition(), null);
@@ -78,9 +80,10 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition piecePosition = move.getStartPosition();
+        TeamColor color = gameBoard.getPiece(piecePosition).getTeamColor();
         Collection<ChessMove> validMovesList = validMoves(piecePosition);
 
-        if (validMovesList.contains(move)) {
+        if (validMovesList.contains(move) && getTeamTurn() == color) {
             movePiece(move);
         }
         else {
@@ -88,7 +91,7 @@ public class ChessGame {
         }
     }
 
-    public ChessPosition kingPosition(TeamColor color) {
+    private ChessPosition kingPosition(TeamColor color) {
         throw new RuntimeException("Not implemented");
     }
 
@@ -101,6 +104,9 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         // inefficient, but you could save the king's position and then get piece moves for all
         // opposing pieces and if any are the same as the king's position then he's in check
+        ChessPosition kingPos = kingPosition(teamColor);
+        
+
         throw new RuntimeException("Not implemented");
     }
 
