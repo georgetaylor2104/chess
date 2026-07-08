@@ -57,19 +57,25 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        // get the piece type from starting position
-        // get the pieces moves
-        // for each move make a deep copy of the board
-        // then call isInCheck() for each move
-        // if true then remove that move from the set
-        // else the move stays
-        // return the set of valid moves
 
         ChessPiece piece = gameBoard.getPiece(startPosition);
-        TeamColor color = piece.getTeamColor();
+        if (piece != null) {
+            TeamColor color = piece.getTeamColor();
+            Collection<ChessMove> pieceMoves = piece.pieceMoves(gameBoard, startPosition);
+            Set<ChessMove> validMoves = new HashSet<>();
 
-
-        throw new RuntimeException("Not implemented");
+            for (ChessMove move : pieceMoves) {
+                ChessGame copyGame = new ChessGame(this);
+                copyGame.movePiece(move);
+                if (!copyGame.isInCheck(color)) {
+                    validMoves.add(move);
+                }
+            }
+            return validMoves;
+        }
+        else {
+            return null;
+        }
     }
 
     private void movePiece(ChessMove move) {
@@ -161,7 +167,6 @@ public class ChessGame {
         // if there are no valid moves and current position is also in check
         ChessPosition kingPos = kingPosition(teamColor);
         return (validMoves(kingPos).isEmpty() && isInCheck(teamColor));
-
     }
 
     /**
