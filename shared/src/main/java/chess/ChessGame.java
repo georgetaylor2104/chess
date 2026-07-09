@@ -106,6 +106,7 @@ public class ChessGame {
 
     private ChessPosition kingPosition(TeamColor color) {
         ChessPosition pos;
+
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
                 pos = new ChessPosition(r+1, c+1);
@@ -115,6 +116,7 @@ public class ChessGame {
                 }
             }
         }
+
         throw new RuntimeException("King piece not found");
     }
 
@@ -126,6 +128,22 @@ public class ChessGame {
                 ChessPosition pos = new ChessPosition(r+1, c+1);
                 ChessPiece piece = gameBoard.getPiece(pos);
                 if (piece != null && piece.getTeamColor() != teamColor) {
+                    enemyPositions.add(pos);
+                }
+            }
+        }
+
+        return enemyPositions;
+    }
+
+    private Collection<ChessPosition> getTeamPositions (TeamColor teamColor) {
+        Set<ChessPosition> enemyPositions = new HashSet<>();
+
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                ChessPosition pos = new ChessPosition(r+1, c+1);
+                ChessPiece piece = gameBoard.getPiece(pos);
+                if (piece != null && piece.getTeamColor() == teamColor) {
                     enemyPositions.add(pos);
                 }
             }
@@ -164,9 +182,18 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        // if there are no valid moves and current position is also in check
-        ChessPosition kingPos = kingPosition(teamColor);
-        return (validMoves(kingPos).isEmpty() && isInCheck(teamColor));
+        boolean empty = true;
+        boolean inCheck = isInCheck(teamColor);
+        Collection<ChessPosition> teamPositions = getTeamPositions(teamColor);
+
+        for (ChessPosition pos : teamPositions) {
+            if (!validMoves(pos).isEmpty()) {
+                empty = false;
+                break;
+            }
+        }
+
+        return (empty && inCheck);
     }
 
     /**
@@ -177,9 +204,17 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        // if there are no valid moves and current position is not in check
-        ChessPosition kingPos = kingPosition(teamColor);
-        return (validMoves(kingPos).isEmpty() && !isInCheck(teamColor));
+        boolean empty = true;
+        Collection<ChessPosition> teamPositions = getTeamPositions(teamColor);
+
+        for (ChessPosition pos : teamPositions) {
+            if (!validMoves(pos).isEmpty()) {
+                empty = false;
+                break;
+            }
+        }
+
+        return (empty && !isInCheck(teamColor));
     }
 
     /**
