@@ -17,10 +17,17 @@ public class Server {
         ctx.result(ex.getMessage());
     }
 
+    private void dataAccessExHandler(DataAccessException ex, Context ctx) {
+        ctx.status(400);
+        ctx.result(ex.getMessage());
+    }
+
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .post("/user", ctx -> new UserHandler().register(ctx))
 
+
+                .exception(DataAccessException.class, this::dataAccessExHandler)
                 .exception(AlreadyTakenException.class, this::alreadyTakenHandler);
 
 
