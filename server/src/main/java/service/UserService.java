@@ -12,10 +12,10 @@ import service.exception.AlreadyTakenException;
 public class UserService {
 
     UserDAO userDAO;
-    AuthDAO authDAO;
     AuthService authService;
 
-    public UserService (UserDAO userDAO, AuthDAO authDAO) {
+    public UserService (UserDAO givenUserDAO, AuthDAO authDAO) {
+        userDAO = givenUserDAO;
         authService = new AuthService(authDAO);
     }
 

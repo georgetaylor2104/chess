@@ -1,15 +1,23 @@
 package service;
 
+import dataaccess.DataAccessException;
 import model.AuthData;
 import dataaccess.AuthDAO;
 import java.util.UUID;
 
 public class AuthService {
 
-    public AuthService (AuthDAO authDAO) {}
+    AuthDAO authDAO;
 
-    public AuthData createAuth(String username) {
-        return null;
+    public AuthService (AuthDAO givenAuthDAO) {
+        authDAO = givenAuthDAO;
+    }
+
+    public AuthData createAuth(String username) throws DataAccessException {
+        String token = generateToken();
+        AuthData authData = new AuthData(token, username);
+        authDAO.createAuth(authData);
+        return authData;
     }
 
     public AuthData getAuth(String username) {
