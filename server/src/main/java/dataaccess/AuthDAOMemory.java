@@ -19,8 +19,13 @@ public class AuthDAOMemory implements AuthDAO{
     }
 
     @Override
-    public void createAuth(AuthData authData) {
-        authMap.put(authData.username(), authData.authToken());
+    public void createAuth(AuthData authData) throws DataAccessException {
+        if (!authMap.containsKey(authData.username())) {
+            authMap.put(authData.username(), authData.authToken());
+        }
+        else {
+            throw new DataAccessException("AuthData already exists");
+        }
     }
 
     @Override
