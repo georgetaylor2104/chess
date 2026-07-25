@@ -9,4 +9,6 @@ public interface AuthDAO {
     AuthData getAuth(String username);
 
     void deleteAuth();
+
+    void clear();
 }

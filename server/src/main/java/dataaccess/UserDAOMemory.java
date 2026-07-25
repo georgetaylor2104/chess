@@ -22,4 +22,9 @@ public class UserDAOMemory implements UserDAO {
 
         return null;
     }
+
+    @Override
+    public void clear() {
+        userMap.clear();
+    }
 }

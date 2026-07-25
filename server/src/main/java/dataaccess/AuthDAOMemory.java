@@ -32,4 +32,9 @@ public class AuthDAOMemory implements AuthDAO{
     public void deleteAuth() {
 
     }
+
+    @Override
+    public void clear() {
+        authMap.clear();
+    }
 }

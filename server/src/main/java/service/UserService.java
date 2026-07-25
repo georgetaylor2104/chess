@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.DataAccessException;
+import io.javalin.http.BadRequestResponse;
 import requests.RegisterRequest;
 import results.RegisterResult;
 import model.UserData;
@@ -19,7 +20,7 @@ public class UserService {
         authService = new AuthService(authDAO);
     }
 
-    public RegisterResult register(RegisterRequest request) throws AlreadyTakenException, DataAccessException {
+    public RegisterResult register(RegisterRequest request) throws DataAccessException, BadRequestResponse {
         UserData checkUserData = userDAO.getUser(request.username());
 
         if (checkUserData != null) {
@@ -31,6 +32,10 @@ public class UserService {
         AuthData authData = authService.createAuth(request.username());
 
         return new RegisterResult(authData.username(), authData.authToken());
+    }
+
+    public void clear() {
+        userDAO.clear();
     }
 
 }

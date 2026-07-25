@@ -1,8 +1,12 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.AuthDAOMemory;
 import dataaccess.DataAccessException;
+import dataaccess.GameDAOMemory;
+import dataaccess.UserDAOMemory;
 import io.javalin.*;
+import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import handler.*;
@@ -22,13 +26,32 @@ public class Server {
         ctx.result(ex.getMessage());
     }
 
+    private void badRequestHandler(BadRequestResponse ex, Context ctx) {
+        ctx.status(400);
+        ctx.result(ex.getMessage());
+    }
+
+    private void ExceptionHandler (Exception ex, Context ctx) {
+        ctx.status(500);
+        ctx.result(ex.getMessage());
+    }
+
     public Server() {
+        UserDAOMemory userDAOMemory = new UserDAOMemory();
+        AuthDAOMemory authDAOMemory = new AuthDAOMemory();
+        GameDAOMemory gameDAOMemory = new GameDAOMemory();
+        UserHandler userHandler = new UserHandler(userDAOMemory, authDAOMemory);
+        ClearHandler clearHandler = new ClearHandler(userDAOMemory, authDAOMemory, gameDAOMemory);
+
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
-                .post("/user", ctx -> new UserHandler().register(ctx))
+                .post("/user", userHandler::register)
+                .delete("/db", clearHandler::delete)
 
-
+                .exception(BadRequestResponse.class, this::badRequestHandler)
                 .exception(DataAccessException.class, this::dataAccessExHandler)
                 .exception(AlreadyTakenException.class, this::alreadyTakenHandler);
+
+                //.exception(Exception.class, this::ExceptionHandler);
 
 
         // Register your endpoints and exception handlers here.

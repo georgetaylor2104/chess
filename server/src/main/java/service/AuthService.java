@@ -36,4 +36,8 @@ public class AuthService {
         return UUID.randomUUID().toString();
     }
 
+    public void clear() {
+        authDAO.clear();
+    }
+
 }

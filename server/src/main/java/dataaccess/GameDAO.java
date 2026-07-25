@@ -13,4 +13,6 @@ public interface GameDAO {
     Collection<ChessGame> listGames();
 
     void updateGame();
+
+    void clearGames();
 }

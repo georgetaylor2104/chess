@@ -1,14 +1,14 @@
 package handler;
 
 import com.google.gson.Gson;
-import dataaccess.AuthDAOMemory;
-import dataaccess.DataAccessException;
-import dataaccess.UserDAOMemory;
-import io.javalin.http.Handler;
+import dataaccess.*;
+import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import requests.RegisterRequest;
+import results.ExceptionResult;
 import results.RegisterResult;
 import service.UserService;
+import service.exception.AlreadyTakenException;
 
 public class UserHandler {
 
@@ -17,13 +17,37 @@ public class UserHandler {
     private final Gson gson = new Gson();
     private final UserService userService = new UserService(new UserDAOMemory(), new AuthDAOMemory());
 
+    public UserHandler (UserDAO userDAO, AuthDAO authDAO) {
+        UserService userService = new UserService(userDAO, authDAO);
+    }
 
-    public void register(Context ctx) throws DataAccessException {
+
+
+    public void register(Context ctx)  {
         RegisterRequest request = gson.fromJson(ctx.body(), RegisterRequest.class);
-        RegisterResult result = userService.register(request);
-        String json = gson.toJson(result);
-        ctx.status(200);
-        ctx.result(json);
+
+        if (request.username() == null || request.password() == null || request.email() == null) {
+            ctx.status(400);
+            ctx.result(gson.toJson(new ExceptionResult(new BadRequestResponse("Error: RegisterRequest cannot have null fields").getMessage())));
+            return;
+        }
+
+        try {
+            RegisterResult result = userService.register(request);
+            String json = gson.toJson(result);
+            ctx.status(200);
+            ctx.result(json);
+        } catch (AlreadyTakenException e) {
+            ctx.status(403);
+            String json = gson.toJson(new ExceptionResult(e.getMessage()));
+            ctx.result(json);
+        } catch (DataAccessException e) {
+            ctx.status(400);
+            String json = gson.toJson(new ExceptionResult(e.getMessage()));
+            ctx.result(json);
+        }
+
+
 
 
     }
