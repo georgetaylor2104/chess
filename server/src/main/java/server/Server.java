@@ -45,6 +45,7 @@ public class Server {
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .post("/user", userHandler::register)
+                .post("session", userHandler::login)
                 .delete("/db", clearHandler::delete)
 
                 .exception(BadRequestResponse.class, this::badRequestHandler)

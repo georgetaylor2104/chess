@@ -8,7 +8,7 @@ public interface AuthDAO {
 
     AuthData getAuth(String username);
 
-    void deleteAuth();
+    void deleteAuth(String authToken);
 
     void clear();
 }

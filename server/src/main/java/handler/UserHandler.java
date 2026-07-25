@@ -4,11 +4,15 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
+import io.javalin.http.UnauthorizedResponse;
+import requests.LoginRequest;
 import requests.RegisterRequest;
 import results.ExceptionResult;
+import results.LoginResult;
 import results.RegisterResult;
 import service.UserService;
 import service.exception.AlreadyTakenException;
+import service.exception.UserNotFoundException;
 
 public class UserHandler {
 
@@ -28,7 +32,7 @@ public class UserHandler {
 
         if (request.username() == null || request.password() == null || request.email() == null) {
             ctx.status(400);
-            ctx.result(gson.toJson(new ExceptionResult(new BadRequestResponse("Error: RegisterRequest cannot have null fields").getMessage())));
+            ctx.result(gson.toJson(new ExceptionResult(new BadRequestResponse("Error: bad request").getMessage())));
             return;
         }
 
@@ -53,6 +57,30 @@ public class UserHandler {
     }
 
     public void login (Context ctx) {
+        LoginRequest request = gson.fromJson(ctx.body(), LoginRequest.class);
+
+        if (request.username() == null || request.password() == null) {
+            ctx.status(400);
+            ctx.result(gson.toJson(new ExceptionResult(new BadRequestResponse("Error: bad request").getMessage())));
+            return;
+        }
+
+        try {
+            LoginResult result = userService.login(request);
+            String json = gson.toJson(result);
+            ctx.status(200);
+            ctx.result(json);
+
+        } catch (DataAccessException e) {
+            ctx.status(400);
+            String json = gson.toJson(new ExceptionResult(e.getMessage()));
+            ctx.result(json);
+
+        }  catch (UnauthorizedResponse e) {
+            ctx.status(401);
+            String json = gson.toJson(new ExceptionResult(e.getMessage()));
+            ctx.result(json);
+        }
 
     }
 

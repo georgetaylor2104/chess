@@ -2,13 +2,17 @@ package service;
 
 import dataaccess.DataAccessException;
 import io.javalin.http.BadRequestResponse;
+import io.javalin.http.UnauthorizedResponse;
+import requests.LoginRequest;
 import requests.RegisterRequest;
+import results.LoginResult;
 import results.RegisterResult;
 import model.UserData;
 import model.AuthData;
 import dataaccess.UserDAO;
 import dataaccess.AuthDAO;
 import service.exception.AlreadyTakenException;
+import service.exception.UserNotFoundException;
 
 public class UserService {
 
@@ -20,11 +24,11 @@ public class UserService {
         authService = new AuthService(authDAO);
     }
 
-    public RegisterResult register(RegisterRequest request) throws DataAccessException, BadRequestResponse {
+    public RegisterResult register(RegisterRequest request) throws DataAccessException {
         UserData checkUserData = userDAO.getUser(request.username());
 
         if (checkUserData != null) {
-            throw new AlreadyTakenException("Error: username already taken");
+            throw new AlreadyTakenException("Error: already taken");
         }
 
         UserData userData = new UserData(request.username(), request.password(), request.email());
@@ -32,6 +36,17 @@ public class UserService {
         AuthData authData = authService.createAuth(request.username());
 
         return new RegisterResult(authData.username(), authData.authToken());
+    }
+
+    public LoginResult login(LoginRequest request) throws DataAccessException, UnauthorizedResponse {
+        UserData userData = userDAO.getUser(request.username());
+
+        if (userData == null || !userData.password().equals(request.password())) {
+            throw new UnauthorizedResponse("Error: unauthorized");
+        }
+
+        AuthData authData = authService.createAuth(request.username());
+        return new LoginResult(authData.username(), authData.authToken());
     }
 
     public void clear() {
