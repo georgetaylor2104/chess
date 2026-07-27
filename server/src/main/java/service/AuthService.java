@@ -15,17 +15,20 @@ public class AuthService {
 
     public AuthData createAuth(String username) throws DataAccessException {
         String token = generateToken();
+        if (username == null) {
+            throw new DataAccessException("Error: username cannot be null");
+        }
         AuthData authData = new AuthData(token, username);
         authDAO.createAuth(authData);
         return authData;
     }
 
     public AuthData getAuth(String username) {
-        return null;
+        return authDAO.getAuth(username);
     }
 
-    public void deleteAuth(AuthData authData) {
-
+    public void logoutAuth(String authToken) {
+        authDAO.deleteAuth(authToken);
     }
 
     public boolean verifyAuthToken(String authToken) {

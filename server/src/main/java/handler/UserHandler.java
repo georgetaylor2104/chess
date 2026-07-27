@@ -6,13 +6,14 @@ import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import io.javalin.http.UnauthorizedResponse;
 import requests.LoginRequest;
+import requests.LogoutRequest;
 import requests.RegisterRequest;
 import results.ExceptionResult;
 import results.LoginResult;
 import results.RegisterResult;
 import service.UserService;
 import service.exception.AlreadyTakenException;
-import service.exception.UserNotFoundException;
+
 
 public class UserHandler {
 
@@ -84,7 +85,36 @@ public class UserHandler {
 
     }
 
-    public void logout (Context ctx) {
+    public void clear() {
+        userService.clear();
+    }
 
+// possible problem with the clear() function
+    public void logout (Context ctx) {
+//        System.out.println(ctx.attributeMap());
+        System.out.println("Headers: " + ctx.headerMap());
+//        System.out.println(ctx.header("authorization"));
+        String authToken = ctx.header("authorization");
+        LogoutRequest request = new LogoutRequest(authToken);
+
+        if (request.authToken() == null) {
+            ctx.status(400);
+            ctx.result(gson.toJson(new ExceptionResult(new BadRequestResponse("Error: bad request").getMessage())));
+            return;
+        }
+
+        try {
+            userService.logout(request);
+            ctx.status(200);
+            ctx.result("");
+        } catch (DataAccessException e) {
+            ctx.status(400);
+            String json = gson.toJson(new ExceptionResult(e.getMessage()));
+            ctx.result(json);
+        } catch (UnauthorizedResponse e) {
+            ctx.status(401);
+            String json = gson.toJson(new ExceptionResult(e.getMessage()));
+            ctx.result(json);
+        }
     }
 }

@@ -4,10 +4,12 @@ import dataaccess.AuthDAOMemory;
 import dataaccess.DataAccessException;
 import dataaccess.UserDAOMemory;
 import io.javalin.http.UnauthorizedResponse;
+import model.AuthData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import requests.LoginRequest;
+import requests.LogoutRequest;
 import requests.RegisterRequest;
 import results.LoginResult;
 import results.RegisterResult;
@@ -60,7 +62,22 @@ public class UserServiceTests {
         LoginRequest loginRequest = new LoginRequest("rootbear67", "discretewrongpassword");
         RegisterResult registerSetUp = userService.register(registerRequest);
         Assertions.assertThrows(UnauthorizedResponse.class, () -> {userService.login(loginRequest);});
-
-
     }
+
+    @Test
+    public void logoutPositiveTest() throws DataAccessException, UnauthorizedResponse {
+        AuthData authData = userService.authService.createAuth("george");
+        String authToken = authData.authToken();
+        LogoutRequest logoutRequest = new LogoutRequest(authToken);
+        userService.logout(logoutRequest);
+        Assertions.assertNull(authDAOMemory.getAuth("george"));
+    }
+
+   @Test
+    public void logoutNegativeTest() throws DataAccessException, UnauthorizedResponse {
+       AuthData authData = userService.authService.createAuth("george");
+       LogoutRequest logoutRequest = new LogoutRequest("835937498");
+       Assertions.assertThrows(UnauthorizedResponse.class, () -> {userService.logout(logoutRequest);});
+
+   }
 }

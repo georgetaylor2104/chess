@@ -1,5 +1,6 @@
 package dataaccess;
 
+import io.javalin.http.UnauthorizedResponse;
 import model.AuthData;
 
 import java.util.HashMap;
@@ -25,7 +26,17 @@ public class AuthDAOMemory implements AuthDAO{
 
     @Override
     public void deleteAuth(String authToken) {
+        boolean removed = false;
+        for (String username : authMap.keySet()) {
+            if (authMap.get(username).equals(authToken)) {
+                authMap.remove(username);
+                removed = true;
+            }
+        }
 
+        if (!removed) {
+            throw new UnauthorizedResponse("Error: invalid authorization");
+        }
     }
 
     @Override

@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.AuthDAOMemory;
 import dataaccess.DataAccessException;
+import io.javalin.http.UnauthorizedResponse;
 import model.AuthData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,16 +32,23 @@ public class AuthServiceTests {
 
     @Test
     public void createAuthNegativeTest() {
-        //makes sure you can't create duplicate authdata for the same username
-        String username = "badstudent67";
-        try {
-            AuthData existing = authService.createAuth(username);
-        }
-        catch (DataAccessException ex) {
-
-        }
+        String username = null;
         Assertions.assertThrows(DataAccessException.class, () -> {authService.createAuth(username);});
     }
 
+    @Test
+    public void logoutAuthPositiveTest() throws DataAccessException, UnauthorizedResponse {
+        AuthData authData = authService.createAuth("george");
+        String authToken = authData.authToken();
+        authService.logoutAuth(authToken);
+        Assertions.assertNull(aDAOMem.getAuth("george"));
+    }
+
+    @Test
+    public void logoutAuthNegativeTest() throws DataAccessException, UnauthorizedResponse {
+        AuthData authData = authService.createAuth("george");
+        String authToken = authData.authToken();
+        Assertions.assertThrows(UnauthorizedResponse.class, () -> {authService.logoutAuth("123456");});
+    }
 
 }

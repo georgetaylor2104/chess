@@ -41,11 +41,13 @@ public class Server {
         AuthDAOMemory authDAOMemory = new AuthDAOMemory();
         GameDAOMemory gameDAOMemory = new GameDAOMemory();
         UserHandler userHandler = new UserHandler(userDAOMemory, authDAOMemory);
-        ClearHandler clearHandler = new ClearHandler(userDAOMemory, authDAOMemory, gameDAOMemory);
+        GameHandler gameHandler = new GameHandler(gameDAOMemory);
+        ClearHandler clearHandler = new ClearHandler(userHandler, gameHandler);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .post("/user", userHandler::register)
-                .post("session", userHandler::login)
+                .post("/session", userHandler::login)
+                .delete("/session", userHandler::logout)
                 .delete("/db", clearHandler::delete)
 
                 .exception(BadRequestResponse.class, this::badRequestHandler)

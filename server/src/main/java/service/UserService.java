@@ -1,9 +1,9 @@
 package service;
 
 import dataaccess.DataAccessException;
-import io.javalin.http.BadRequestResponse;
 import io.javalin.http.UnauthorizedResponse;
 import requests.LoginRequest;
+import requests.LogoutRequest;
 import requests.RegisterRequest;
 import results.LoginResult;
 import results.RegisterResult;
@@ -12,7 +12,6 @@ import model.AuthData;
 import dataaccess.UserDAO;
 import dataaccess.AuthDAO;
 import service.exception.AlreadyTakenException;
-import service.exception.UserNotFoundException;
 
 public class UserService {
 
@@ -49,8 +48,15 @@ public class UserService {
         return new LoginResult(authData.username(), authData.authToken());
     }
 
+    public void logout(LogoutRequest request) throws DataAccessException, UnauthorizedResponse {
+        String authToken = request.authToken();
+        authService.logoutAuth(authToken);
+
+    }
+
     public void clear() {
         userDAO.clear();
+        authService.clear();
     }
 
 }
