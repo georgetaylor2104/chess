@@ -42,9 +42,8 @@ public class Server {
         AuthDAOMemory authDAO = new AuthDAOMemory();
         GameDAOMemory gameDAO = new GameDAOMemory();
         AuthService authService = new AuthService(authDAO);
-        AuthHandler authHandler = new AuthHandler(authService);
-        UserHandler userHandler = new UserHandler(userDAO, authDAO);
-        GameHandler gameHandler = new GameHandler(gameDAO, authDAO);
+        UserHandler userHandler = new UserHandler(userDAO, authService);
+        GameHandler gameHandler = new GameHandler(gameDAO, authService);
         ClearHandler clearHandler = new ClearHandler(userHandler, gameHandler);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
@@ -52,6 +51,7 @@ public class Server {
                 .post("/session", userHandler::login)
                 .post("/game", gameHandler::createGame)
                 .get("/game", gameHandler::listGames)
+                .put("/game", gameHandler::joinGame)
                 .delete("/session", userHandler::logout)
                 .delete("/db", clearHandler::delete)
 

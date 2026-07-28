@@ -18,9 +18,9 @@ public class UserService {
     UserDAO userDAO;
     AuthService authService;
 
-    public UserService (UserDAO givenUserDAO, AuthDAO authDAO) {
+    public UserService (UserDAO givenUserDAO, AuthService givenAuthService) {
         userDAO = givenUserDAO;
-        authService = new AuthService(authDAO);
+        authService = givenAuthService;
     }
 
     public RegisterResult register(RegisterRequest request) throws DataAccessException {

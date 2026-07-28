@@ -20,6 +20,19 @@ public class AuthDAOMemory implements AuthDAO{
     }
 
     @Override
+    public String getUsername(String authToken) {
+        String username = "";
+        for (String user : authMap.keySet()) {
+            if (authMap.get(user) != null) {
+                if (authMap.get(user).equals(authToken)) {
+                    username = user;
+                }
+            }
+        }
+        return username;
+    }
+
+    @Override
     public void createAuth(AuthData authData) {
         authMap.put(authData.username(), authData.authToken());
     }
@@ -27,8 +40,8 @@ public class AuthDAOMemory implements AuthDAO{
     @Override
     public boolean verifyAuth(String authToken) {
         boolean verified = false;
-        for (String username : authMap.keySet()) {
-            if (authMap.get(username).equals(authToken)) {
+        for (String auth : authMap.values()) {
+            if (auth.equals(authToken)) {
                 verified = true;
             }
         }

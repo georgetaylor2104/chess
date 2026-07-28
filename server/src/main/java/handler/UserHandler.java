@@ -11,6 +11,7 @@ import requests.RegisterRequest;
 import results.ExceptionResult;
 import results.LoginResult;
 import results.RegisterResult;
+import service.AuthService;
 import service.UserService;
 import service.exception.AlreadyTakenException;
 
@@ -22,8 +23,8 @@ public class UserHandler {
     private final Gson gson = new Gson();
     private final UserService userService;
 
-    public UserHandler (UserDAO userDAO, AuthDAO authDAO) {
-        userService = new UserService(userDAO, authDAO);
+    public UserHandler (UserDAO userDAO, AuthService authService) {
+        userService = new UserService(userDAO, authService);
     }
 
 

@@ -7,11 +7,13 @@ import model.GameData;
 import dataaccess.GameDAO;
 import dataaccess.DataAccessException;
 import requests.CreateGameRequest;
+import requests.JoinGameRequest;
 import requests.ListGamesRequest;
 import results.CreateGameResult;
 import results.ListGamesResult;
+import service.exception.AlreadyTakenException;
+import service.exception.GameNotFoundException;
 
-import java.util.random.RandomGenerator;
 
 public class GameService {
     GameDAO gameDAO;
@@ -19,9 +21,9 @@ public class GameService {
     private int gameIDNum = 1000;
 
 
-    public GameService (GameDAO givenGameDAO, AuthDAO authDAO) {
+    public GameService (GameDAO givenGameDAO, AuthService givenAuthService) {
         gameDAO = givenGameDAO;
-        authService = new AuthService(authDAO);
+        authService = givenAuthService;
     }
 
 
@@ -36,6 +38,17 @@ public class GameService {
     public ListGamesResult listGames(ListGamesRequest request) throws UnauthorizedResponse {
         authService.verifyAuthToken(request.authToken());
         return new ListGamesResult(gameDAO.listGames());
+    }
+
+    public void joinGame(JoinGameRequest request) throws UnauthorizedResponse, AlreadyTakenException, GameNotFoundException, DataAccessException {
+        authService.verifyAuthToken(request.authToken());
+        if (!gameDAO.contains(request.gameID())) {
+            throw new GameNotFoundException("Error: game not found");
+        }
+
+        String username = authService.authDAO.getUsername(request.authToken());
+        gameDAO.updateGame(request.playerColor(), request.gameID(), username);
+
     }
 
     public void clear() {

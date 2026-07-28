@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.GameData;
+import service.exception.AlreadyTakenException;
 
 import java.util.Collection;
 
@@ -13,7 +14,7 @@ public interface GameDAO {
 
     Collection<GameData> listGames();
 
-    void updateGame();
+    void updateGame(ChessGame.TeamColor playerColor, Integer gameID, String username) throws AlreadyTakenException, DataAccessException;
 
     void clearGames();
     boolean contains(Integer gameID);

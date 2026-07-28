@@ -18,14 +18,14 @@ import service.exception.AlreadyTakenException;
 public class UserServiceTests {
 
     UserDAOMemory userDAOMemory;
-    AuthDAOMemory authDAOMemory;
+    AuthService authService;
     UserService userService;
 
     @BeforeEach
     public void setUp() {
         userDAOMemory = new UserDAOMemory();
-        authDAOMemory = new AuthDAOMemory();
-        userService = new UserService(userDAOMemory, authDAOMemory);
+        authService = new AuthService(new AuthDAOMemory());
+        userService = new UserService(userDAOMemory, authService);
     }
 
     @Test
@@ -70,7 +70,7 @@ public class UserServiceTests {
         String authToken = authData.authToken();
         LogoutRequest logoutRequest = new LogoutRequest(authToken);
         userService.logout(logoutRequest);
-        Assertions.assertNull(authDAOMemory.getAuth("george"));
+        Assertions.assertNull(authService.authDAO.getAuth("george"));
     }
 
    @Test

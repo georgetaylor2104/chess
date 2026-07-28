@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.GameData;
+import service.exception.AlreadyTakenException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,13 +26,37 @@ public class GameDAOMemory implements GameDAO{
 
     @Override
     public Collection<GameData> listGames() {
-//        List<GameData> gameList = new ArrayList<>();
-//        gameList.addAll(gameMap.values());
         return gameMap.values();
     }
 
     @Override
-    public void updateGame() {
+    public void updateGame(ChessGame.TeamColor playerColor, Integer gameID, String username) throws AlreadyTakenException, DataAccessException {
+
+        switch (playerColor) {
+            case ChessGame.TeamColor.WHITE:
+                if (gameMap.get(gameID).whiteUsername() != null) {
+                    throw new AlreadyTakenException("Error: playerColor already taken");
+                }
+                else {
+                    GameData gameData = gameMap.get(gameID);
+                    GameData updated = new GameData(gameID, username, gameData.blackUsername(), gameData.gameName(), gameData.game());
+                    gameMap.put(gameID, updated);
+
+                }
+                break;
+
+            case ChessGame.TeamColor.BLACK:
+                if (gameMap.get(gameID).blackUsername() != null) {
+                    throw new AlreadyTakenException("Error: playerColor already taken");
+                }
+                else {
+                    GameData gameData = gameMap.get(gameID);
+                    GameData updated = new GameData(gameID, gameData.whiteUsername(), username, gameData.gameName(), gameData.game());
+                    gameMap.put(gameID, updated);
+                }
+                break;
+
+        }
     }
 
     @Override
