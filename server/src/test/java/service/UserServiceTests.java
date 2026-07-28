@@ -61,6 +61,7 @@ public class UserServiceTests {
         RegisterRequest registerRequest = new RegisterRequest("rootbear67", "discreteinnuendo", "dumbfrickin@email.com");
         LoginRequest loginRequest = new LoginRequest("rootbear67", "discretewrongpassword");
         RegisterResult registerSetUp = userService.register(registerRequest);
+
         Assertions.assertThrows(UnauthorizedResponse.class, () -> {userService.login(loginRequest);});
     }
 
@@ -70,13 +71,15 @@ public class UserServiceTests {
         String authToken = authData.authToken();
         LogoutRequest logoutRequest = new LogoutRequest(authToken);
         userService.logout(logoutRequest);
-        Assertions.assertNull(authService.authDAO.getAuth("george"));
+
+        Assertions.assertFalse(authService.authDAO.verifyAuth(authToken));
     }
 
    @Test
     public void logoutNegativeTest() throws DataAccessException, UnauthorizedResponse {
        AuthData authData = userService.authService.createAuth("george");
        LogoutRequest logoutRequest = new LogoutRequest("835937498");
+
        Assertions.assertThrows(UnauthorizedResponse.class, () -> {userService.logout(logoutRequest);});
 
    }

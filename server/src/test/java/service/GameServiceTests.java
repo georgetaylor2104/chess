@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.AuthDAOMemory;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAOMemory;
@@ -10,8 +11,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import requests.CreateGameRequest;
+import requests.JoinGameRequest;
 import requests.ListGamesRequest;
 import results.CreateGameResult;
+import service.exception.GameNotFoundException;
+
 import java.util.Collection;
 
 public class GameServiceTests {
@@ -33,6 +37,7 @@ public class GameServiceTests {
         authService.authDAO.createAuth(authData);
         CreateGameRequest request = new CreateGameRequest(authData.authToken(), "George's game");
         CreateGameResult result = gameService.createGame(request);
+
         Assertions.assertTrue(gameDAOMemory.contains(result.gameID()));
     }
 
@@ -41,6 +46,7 @@ public class GameServiceTests {
         AuthData authData = new AuthData("1234", "george");
         authService.authDAO.createAuth(authData);
         CreateGameRequest request = new CreateGameRequest("5678", "George's game");
+
         Assertions.assertThrows(UnauthorizedResponse.class, () -> {gameService.createGame(request);});
     }
 
@@ -54,6 +60,7 @@ public class GameServiceTests {
         gameService.createGame(createRequest2);
         ListGamesRequest request = new ListGamesRequest(authData.authToken());
         Collection<GameData> list = gameService.listGames(request).games();
+
         Assertions.assertEquals(2, list.size());
     }
 
@@ -66,6 +73,30 @@ public class GameServiceTests {
         gameService.createGame(createRequest1);
         gameService.createGame(createRequest2);
         ListGamesRequest request = new ListGamesRequest("5678");
+
         Assertions.assertThrows(UnauthorizedResponse.class, () -> {gameService.listGames(request);});
+    }
+
+    @Test
+    public void joinGamePositiveTest() throws DataAccessException {
+        AuthData authData = new AuthData("1234", "george");
+        authService.authDAO.createAuth(authData);
+        CreateGameRequest createRequest = new CreateGameRequest(authData.authToken(), "George's game");
+        CreateGameResult createResult = gameService.createGame(createRequest);
+        JoinGameRequest request = new JoinGameRequest(authData.authToken(), ChessGame.TeamColor.WHITE, createResult.gameID());
+        gameService.joinGame(request);
+        GameData gameData = gameDAOMemory.getGame(createResult.gameID());
+
+        Assertions.assertEquals(gameData.whiteUsername(), authData.username());
+    }
+
+    @Test
+    public void joinGameNegativeTest() throws DataAccessException {
+        AuthData authData = new AuthData("1234", "george");
+        authService.authDAO.createAuth(authData);
+        CreateGameRequest createRequest = new CreateGameRequest(authData.authToken(), "George's game");
+        CreateGameResult createResult = gameService.createGame(createRequest);
+        JoinGameRequest request = new JoinGameRequest(authData.authToken(), ChessGame.TeamColor.WHITE, 5678);
+        Assertions.assertThrows(GameNotFoundException.class, () -> {gameService.joinGame(request);});
     }
 }

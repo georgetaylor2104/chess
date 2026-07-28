@@ -1,14 +1,10 @@
 package server;
 
-import com.google.gson.Gson;
 import dataaccess.AuthDAOMemory;
-import dataaccess.DataAccessException;
 import dataaccess.GameDAOMemory;
 import dataaccess.UserDAOMemory;
 import io.javalin.*;
-import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
-import io.javalin.http.Handler;
 import handler.*;
 import service.AuthService;
 import service.exception.*;
@@ -16,21 +12,6 @@ import service.exception.*;
 public class Server {
 
     private final Javalin javalin;
-
-    private void alreadyTakenHandler(AlreadyTakenException ex, Context ctx) {
-        ctx.status(403);
-        ctx.result(ex.getMessage());
-    }
-
-    private void dataAccessExHandler(DataAccessException ex, Context ctx) {
-        ctx.status(400);
-        ctx.result(ex.getMessage());
-    }
-
-    private void badRequestHandler(BadRequestResponse ex, Context ctx) {
-        ctx.status(400);
-        ctx.result(ex.getMessage());
-    }
 
     private void ExceptionHandler (Exception ex, Context ctx) {
         ctx.status(500);
@@ -55,14 +36,7 @@ public class Server {
                 .delete("/session", userHandler::logout)
                 .delete("/db", clearHandler::delete)
 
-                .exception(BadRequestResponse.class, this::badRequestHandler)
-                .exception(DataAccessException.class, this::dataAccessExHandler)
-                .exception(AlreadyTakenException.class, this::alreadyTakenHandler);
-
-                //.exception(Exception.class, this::ExceptionHandler);
-
-
-        // Register your endpoints and exception handlers here.
+                .exception(Exception.class, this::ExceptionHandler);
 
     }
 

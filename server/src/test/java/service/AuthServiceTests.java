@@ -41,7 +41,7 @@ public class AuthServiceTests {
         AuthData authData = authService.createAuth("george");
         String authToken = authData.authToken();
         authService.logoutAuth(authToken);
-        Assertions.assertNull(aDAOMem.getAuth("george"));
+        Assertions.assertFalse(aDAOMem.verifyAuth(authToken));
     }
 
     @Test

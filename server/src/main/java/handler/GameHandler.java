@@ -2,11 +2,9 @@ package handler;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import io.javalin.http.BadRequestResponse;
-import io.javalin.http.Handler;
 import io.javalin.http.Context;
 import io.javalin.http.UnauthorizedResponse;
 import requests.*;
@@ -46,8 +44,6 @@ public class GameHandler {
             String json = gson.toJson(new ExceptionResult(e.getMessage()));
             ctx.result(json);
         }
-
-
     }
 
     public void createGame(Context ctx) {
@@ -113,7 +109,6 @@ public class GameHandler {
             String json = gson.toJson(new ExceptionResult(e.getMessage()));
             ctx.result(json);
         }
-
     }
 
     public void clear() {

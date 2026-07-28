@@ -15,19 +15,13 @@ import service.AuthService;
 import service.UserService;
 import service.exception.AlreadyTakenException;
 
-
 public class UserHandler {
-
-
-
     private final Gson gson = new Gson();
     private final UserService userService;
 
     public UserHandler (UserDAO userDAO, AuthService authService) {
         userService = new UserService(userDAO, authService);
     }
-
-
 
     public void register(Context ctx)  {
         RegisterRequest request = gson.fromJson(ctx.body(), RegisterRequest.class);
@@ -52,10 +46,6 @@ public class UserHandler {
             String json = gson.toJson(new ExceptionResult(e.getMessage()));
             ctx.result(json);
         }
-
-
-
-
     }
 
     public void login (Context ctx) {
@@ -83,7 +73,6 @@ public class UserHandler {
             String json = gson.toJson(new ExceptionResult(e.getMessage()));
             ctx.result(json);
         }
-
     }
 
     public void clear() {

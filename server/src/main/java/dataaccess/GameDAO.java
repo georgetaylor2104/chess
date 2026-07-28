@@ -10,12 +10,13 @@ public interface GameDAO {
 
     void createGame(String gameName, Integer gameID);
 
-    ChessGame getGame();
-
     Collection<GameData> listGames();
+
+    GameData getGame(Integer gameID);
 
     void updateGame(ChessGame.TeamColor playerColor, Integer gameID, String username) throws AlreadyTakenException, DataAccessException;
 
     void clearGames();
+
     boolean contains(Integer gameID);
 }

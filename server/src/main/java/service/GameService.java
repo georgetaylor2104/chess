@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.AuthDAO;
 import io.javalin.http.UnauthorizedResponse;
-import model.AuthData;
-import model.GameData;
 import dataaccess.GameDAO;
 import dataaccess.DataAccessException;
 import requests.CreateGameRequest;
@@ -14,18 +11,15 @@ import results.ListGamesResult;
 import service.exception.AlreadyTakenException;
 import service.exception.GameNotFoundException;
 
-
 public class GameService {
     GameDAO gameDAO;
     AuthService authService;
     private int gameIDNum = 1000;
 
-
     public GameService (GameDAO givenGameDAO, AuthService givenAuthService) {
         gameDAO = givenGameDAO;
         authService = givenAuthService;
     }
-
 
     public CreateGameResult createGame(CreateGameRequest request) throws UnauthorizedResponse {
         authService.verifyAuthToken(request.authToken());

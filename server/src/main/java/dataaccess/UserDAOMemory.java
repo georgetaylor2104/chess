@@ -11,7 +11,6 @@ public class UserDAOMemory implements UserDAO {
     @Override
     public void createUser(UserData userData) throws DataAccessException {
         userMap.put(userData.username(), userData);
-
     }
 
     @Override

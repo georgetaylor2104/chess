@@ -24,10 +24,6 @@ public class AuthService {
         return authData;
     }
 
-    public AuthData getAuth(String username) {
-        return authDAO.getAuth(username);
-    }
-
     public void logoutAuth(String authToken) {
         authDAO.deleteAuth(authToken);
     }

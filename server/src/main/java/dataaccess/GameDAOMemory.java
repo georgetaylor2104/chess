@@ -3,13 +3,10 @@ package dataaccess;
 import chess.ChessGame;
 import model.GameData;
 import service.exception.AlreadyTakenException;
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
-public class GameDAOMemory implements GameDAO{
+public class GameDAOMemory implements GameDAO {
 
     private final HashMap<Integer, GameData> gameMap = new HashMap<>();
 
@@ -17,11 +14,6 @@ public class GameDAOMemory implements GameDAO{
     public void createGame(String gameName, Integer gameID) {
         GameData gameData = new GameData(gameID, null, null, gameName, new ChessGame());
         gameMap.put(gameID, gameData);
-    }
-
-    @Override
-    public ChessGame getGame() {
-        return null;
     }
 
     @Override
@@ -55,13 +47,17 @@ public class GameDAOMemory implements GameDAO{
                     gameMap.put(gameID, updated);
                 }
                 break;
-
         }
     }
 
     @Override
     public boolean contains(Integer gameID) {
         return gameMap.containsKey(gameID);
+    }
+
+    @Override
+    public GameData getGame(Integer gameID) {
+        return gameMap.get(gameID);
     }
 
     @Override

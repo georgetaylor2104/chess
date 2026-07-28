@@ -10,7 +10,6 @@ import results.RegisterResult;
 import model.UserData;
 import model.AuthData;
 import dataaccess.UserDAO;
-import dataaccess.AuthDAO;
 import service.exception.AlreadyTakenException;
 
 public class UserService {
@@ -51,12 +50,10 @@ public class UserService {
     public void logout(LogoutRequest request) throws DataAccessException, UnauthorizedResponse {
         String authToken = request.authToken();
         authService.logoutAuth(authToken);
-
     }
 
     public void clear() {
         userDAO.clear();
         authService.clear();
     }
-
 }
