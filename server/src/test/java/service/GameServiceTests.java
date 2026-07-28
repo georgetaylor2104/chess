@@ -1,15 +1,21 @@
 package service;
 
 import dataaccess.AuthDAOMemory;
+import dataaccess.GameDAO;
 import dataaccess.GameDAOMemory;
 import dataaccess.UserDAOMemory;
 import io.javalin.http.UnauthorizedResponse;
 import model.AuthData;
+import model.GameData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import requests.CreateGameRequest;
+import requests.ListGamesRequest;
 import results.CreateGameResult;
+
+import java.util.Collection;
+import java.util.List;
 
 
 public class GameServiceTests {
@@ -48,11 +54,22 @@ public class GameServiceTests {
         authDAOMemory.createAuth(authData);
         CreateGameRequest createRequest1 = new CreateGameRequest(authData.authToken(), "game1");
         CreateGameRequest createRequest2 = new CreateGameRequest(authData.authToken(), "game2");
-
+        gameService.createGame(createRequest1);
+        gameService.createGame(createRequest2);
+        ListGamesRequest request = new ListGamesRequest(authData.authToken());
+        Collection<GameData> list = gameService.listGames(request).games();
+        Assertions.assertEquals(2, list.size());
     }
 
     @Test
     public void listGamesNegativeTest() {
-
+        AuthData authData = new AuthData("1234", "george");
+        authDAOMemory.createAuth(authData);
+        CreateGameRequest createRequest1 = new CreateGameRequest(authData.authToken(), "game1");
+        CreateGameRequest createRequest2 = new CreateGameRequest(authData.authToken(), "game2");
+        gameService.createGame(createRequest1);
+        gameService.createGame(createRequest2);
+        ListGamesRequest request = new ListGamesRequest("5678");
+        Assertions.assertThrows(UnauthorizedResponse.class, () -> {gameService.listGames(request);});
     }
 }
