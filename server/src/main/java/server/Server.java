@@ -10,6 +10,7 @@ import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import handler.*;
+import service.AuthService;
 import service.exception.*;
 
 public class Server {
@@ -37,16 +38,20 @@ public class Server {
     }
 
     public Server() {
-        UserDAOMemory userDAOMemory = new UserDAOMemory();
-        AuthDAOMemory authDAOMemory = new AuthDAOMemory();
-        GameDAOMemory gameDAOMemory = new GameDAOMemory();
-        UserHandler userHandler = new UserHandler(userDAOMemory, authDAOMemory);
-        GameHandler gameHandler = new GameHandler(gameDAOMemory);
+        UserDAOMemory userDAO = new UserDAOMemory();
+        AuthDAOMemory authDAO = new AuthDAOMemory();
+        GameDAOMemory gameDAO = new GameDAOMemory();
+        AuthService authService = new AuthService(authDAO);
+        AuthHandler authHandler = new AuthHandler(authService);
+        UserHandler userHandler = new UserHandler(userDAO, authDAO);
+        GameHandler gameHandler = new GameHandler(gameDAO, authDAO);
         ClearHandler clearHandler = new ClearHandler(userHandler, gameHandler);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .post("/user", userHandler::register)
                 .post("/session", userHandler::login)
+                .post("/game", gameHandler::createGame)
+                .get("/game", gameHandler::listGames)
                 .delete("/session", userHandler::logout)
                 .delete("/db", clearHandler::delete)
 

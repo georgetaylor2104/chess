@@ -25,6 +25,17 @@ public class AuthDAOMemory implements AuthDAO{
     }
 
     @Override
+    public boolean verifyAuth(String authToken) {
+        boolean verified = false;
+        for (String username : authMap.keySet()) {
+            if (authMap.get(username).equals(authToken)) {
+                verified = true;
+            }
+        }
+        return verified;
+    }
+
+    @Override
     public void deleteAuth(String authToken) {
         boolean removed = false;
         for (String username : authMap.keySet()) {

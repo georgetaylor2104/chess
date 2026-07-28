@@ -20,10 +20,10 @@ public class UserHandler {
 
 
     private final Gson gson = new Gson();
-    private final UserService userService = new UserService(new UserDAOMemory(), new AuthDAOMemory());
+    private final UserService userService;
 
     public UserHandler (UserDAO userDAO, AuthDAO authDAO) {
-        UserService userService = new UserService(userDAO, authDAO);
+        userService = new UserService(userDAO, authDAO);
     }
 
 
@@ -89,11 +89,7 @@ public class UserHandler {
         userService.clear();
     }
 
-// possible problem with the clear() function
     public void logout (Context ctx) {
-//        System.out.println(ctx.attributeMap());
-        System.out.println("Headers: " + ctx.headerMap());
-//        System.out.println(ctx.header("authorization"));
         String authToken = ctx.header("authorization");
         LogoutRequest request = new LogoutRequest(authToken);
 

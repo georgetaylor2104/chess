@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.DataAccessException;
+import io.javalin.http.UnauthorizedResponse;
 import model.AuthData;
 import dataaccess.AuthDAO;
 import java.util.UUID;
@@ -31,8 +32,10 @@ public class AuthService {
         authDAO.deleteAuth(authToken);
     }
 
-    public boolean verifyAuthToken(String authToken) {
-        return true;
+    public void verifyAuthToken(String authToken) throws UnauthorizedResponse {
+        if (!authDAO.verifyAuth(authToken)) {
+            throw new UnauthorizedResponse("Error: unauthorized");
+        }
     }
 
     private static String generateToken() {
